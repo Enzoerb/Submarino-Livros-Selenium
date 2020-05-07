@@ -55,20 +55,20 @@ def get_book_info(driver):
     try:
         category_elements = driver.find_elements_by_xpath(
             '//a[@class="BreadcrumbItem-ohhfq9-1 jSVYeJ LinkUI-sc-1soz7d4-0 fQBLjw"]')
-        if len(category_elements > 0):
+        if len(category_elements) > 0:
             category_info = (category_elements[-1].get_attribute('href'))
             category_info = category_info.split('/')[5:]
-            category_info = ', '.join(category_info)
+            category_info = '-'.join(category_info)
         else:
-            category_info = 'Not Found'
+            category_info = 'None'
     except NoSuchElementException:
-        category_info = 'Not Found'
+        category_info = 'None'
 
     try:
         name_element = driver.find_element_by_xpath('//h1[@id="product-name-default"]')
         name_info = name_element.get_attribute('innerHTML')
     except NoSuchElementException:
-        name_info = 'Not Found'
+        name_info = 'None'
 
     try:
         driver.implicitly_wait(0.5)
@@ -79,9 +79,10 @@ def get_book_info(driver):
             price_element = driver.find_element_by_xpath(
                 '//span[@class="price__SalesPrice-sc-1i11rkh-2 jjADsQ TextUI-sc-12tokcy-0 CIZtP"]')
         price_info = price_element.get_attribute('innerHTML')
+        price_info = price_info.replace('R$', '').strip()
 
     except NoSuchElementException:
-        price_info = 'Not Found'
+        price_info = 'None'
 
     driver.implicitly_wait(3)
     return category_info, name_info, price_info
