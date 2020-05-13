@@ -1,6 +1,7 @@
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from datetime import datetime
-from functions import get_category_links, get_pagination_links, get_books_links, get_book_info
+from functions import get_category, get_pagination, get_book_info
 from pprint import pprint
 from time import sleep
 
@@ -9,21 +10,31 @@ with webdriver.Chrome() as driver:
     driver.implicitly_wait(3)
     driver.get("https://www.submarino.com.br/categoria/livros?chave=prf_hm_mn_bn_0_2_livros")
     with open('submarion_books.csv', 'w') as file:
-        category_links = get_category_links(driver)
-        for category in category_links:
-            driver.get(category)
-            pagination = get_pagination_links(driver)
-            for page in pagination:
-                driver.get(page)
-                books_links = get_books_links(driver)
-                for book in books_links:
-                    driver.get(book)
-                    category_info, name_info, price_info = get_book_info(driver)
-                    file.write(f'{page};')
-                    file.write(f'{category_info};')
-                    file.write(f'{name_info};')
-                    file.write(f'{price_info}')
-                    file.write('\n')
+        category_info = get_category(driver)
+        for category_link, category_name in category_info:
+            try:
+                driver.get(category_link)
+            except TimeoutException:
+                break
+            subcategory_info = get_category(driver)
+            for subcategory_link, subcategory_name in subcategory_info:
+                try:
+                    driver.get(subcategory_link)
+                except TimeoutException:
+                    break
+                print(f'{category_name} > {subcategory_name}')
+                pagination = get_pagination(driver)
+                for page in pagination:
+                    try:
+                        driver.get(page)
+                    except TimeoutException:
+                        break
+                    books = get_book_info(driver)
+                    for link, title, price in books:
+                        book_info = [str(category_name), str(subcategory_name),
+                                     str(link), str(title), str(price)]
+                        delimiter = '|'
+                        file.write(f'{delimiter.join(book_info)}\n')
 end = datetime.now()
 time = end - beggining
 print(time)
