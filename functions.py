@@ -27,8 +27,10 @@ def get_category(driver):
     except NoSuchElementException:
         info = (driver.current_url, 'None')
         categories.append(info)
+    if len(categories) == 0:
+        info = (driver.current_url, 'None')
+        categories.append(info)
 
-    print(len(categories))
     return categories
 
 
@@ -44,7 +46,6 @@ def get_pagination(driver):
             links.add(driver.current_url)
     except NoSuchElementException:
         links.add(driver.current_url)
-    print(len(links))
     return links
 
 

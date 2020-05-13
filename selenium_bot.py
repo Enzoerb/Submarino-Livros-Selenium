@@ -11,12 +11,14 @@ with webdriver.Chrome() as driver:
     driver.get("https://www.submarino.com.br/categoria/livros?chave=prf_hm_mn_bn_0_2_livros")
     with open('submarion_books.csv', 'w') as file:
         category_info = get_category(driver)
+        print(f'categories count: {len(category_info)}')
         for category_link, category_name in category_info:
             try:
                 driver.get(category_link)
             except TimeoutException:
                 break
             subcategory_info = get_category(driver)
+            print(f'subcategories count: {len(subcategory_info)}')
             for subcategory_link, subcategory_name in subcategory_info:
                 try:
                     driver.get(subcategory_link)
@@ -24,6 +26,7 @@ with webdriver.Chrome() as driver:
                     break
                 print(f'{category_name} > {subcategory_name}')
                 pagination = get_pagination(driver)
+                print(f'pages count: {len(pagination)}')
                 for page in pagination:
                     try:
                         driver.get(page)
